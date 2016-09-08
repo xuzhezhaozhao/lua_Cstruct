@@ -7,25 +7,10 @@ package.loaded[moduleName] = M
 
 -- metatable
 local mt = {}
-function mt.__index(self, k)
-end
 
 local numLen = 8		-- store double
 local strLen = 8		-- store a pointer
 
---[
--- struct = {
--- _length_
--- _offset_
--- _root_
--- key = {
---		_type_ = 0, 1, 2
---		_offset_
---		_root_
---		[...] optional
--- }
--- }
---]
 local function _define_structure(ltype, offset)
 	if (offset == nil) then
 		offset = 0
@@ -55,6 +40,7 @@ local function _populate(stype)
 	for k, v in pairs(stype) do
 		if (type(v) == "table") then
 			v._root_ = stype._root_
+			setmetatable(v, mt)
 			if (v._type_ == 2) then
 				_populate(v)
 			end
@@ -102,4 +88,18 @@ function M.set(nth, key, value)
 		-- table, error
 	else
 	end
+end
+
+function mt.__index(self, k)
+	if (type(k) ~= "number") then
+		return nil
+	end
+	return M.get(k, self)
+end
+
+function mt.__newindex(self, k, value)
+	if (type(k) ~= "number") then
+		return nil
+	end
+	M.set(k, self, value)
 end

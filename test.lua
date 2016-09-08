@@ -75,3 +75,12 @@ test(stud.score == st.student.score, 38)
 cs.set(13, stud.score, 97)
 test(cs.get(13, stud.score) == 97, 39)
 test(cs.get(13, st.student.score) == 97, 40)
+
+cs.set(1, st.name, "zhezhao")
+test(st.name[1] == "zhezhao", 41)
+
+st.name[2] = "wusong"
+test(st.name[2] == "wusong", 42)
+
+st.student.id[12] = 1001
+test(st.student.id[12] == 1001, 43)
