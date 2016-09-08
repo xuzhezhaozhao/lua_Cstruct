@@ -17,6 +17,11 @@ local TSTRING = 1
 local TBOOL = 2
 local TTABLE = 3
 
+local key_words = {
+	_length_=true, _type_=true, _offset_=true, 
+	_root_=true, _data_=true, _n_=true
+}
+
 local function _define_structure(ltype, offset)
 	if (offset == nil) then
 		offset = 0
@@ -24,6 +29,12 @@ local function _define_structure(ltype, offset)
 	local struct = {_length_ = 0}
 	for k, v in pairs(ltype) do
 		local curoffset = offset + struct._length_
+		if (type(k) ~= "string") then
+			error("key must be string")
+		end
+		if (key_words[k] == true) then
+			error(string.format("keyname '%s' is not allowed used", k))
+		end
 		if (v == "number") then
 			struct[k] = {_type_ = TNUMBER, _offset_ = curoffset}
 			struct._length_ = struct._length_ + numLen
@@ -31,14 +42,16 @@ local function _define_structure(ltype, offset)
 			struct[k] = {_type_ = TSTRING, _offset_ = curoffset}
 			struct._length_ = struct._length_ + strLen
 		elseif (v == "bool") then
-			struct[k] = {_type_ = TBOOL, offset = curoffset}
-			struct._length_ = struct._length_ + strLen
+			struct[k] = {_type_ = TBOOL, _offset_ = curoffset}
+			struct._length_ = struct._length_ + boolLen
 		elseif (type(v) == "table") then
 			local substruct = _define_structure(v, curoffset)
 			struct[k] = substruct;
 			struct[k]._type_ = TTABLE;
 			struct[k]._offset_ = curoffset;
 			struct._length_ = struct._length_ + substruct._length_
+		else 
+			error(string.format("%s: invalid type", v))
 		end
 	end
 	struct._root_ = struct
@@ -61,14 +74,19 @@ function M.create(ltype, n)
 	if (n == nil) then
 		n = 1
 	end
+	if (n < 0) then
+		error("argument error: n should greater than 0")
+	end
 	local stype = _define_structure(ltype)
 	local data, errmsg = clib.calloc(n*stype._length_)
+	if (data == nil) then
+		error(string.format("clib malloc: %s", errmsg))
+	end
 	stype._data_ 	= data
 	stype._n_ 		= n
 	_populate(stype)
 	return stype
 end
-
 
 function M.get(nth, key)
 	local data = key._root_._data_
@@ -83,11 +101,6 @@ function M.get(nth, key)
 	elseif (key._type_ == TBOOL) then
 		-- boolean
 		return clib.get_bool(data, len, nth-1, key._offset_)
-	elseif (key._type_ == TTABLE) then
-		-- table, error
-		return nil
-	else
-		return nil
 	end
 end
 
@@ -111,9 +124,6 @@ function M.set(nth, key, value)
 	elseif (key._type_ == TBOOL) then
 		-- boolean
 		clib.set_bool(data, len, nth-1, key._offset_, value)
-	elseif (key._type_ == TTABLE) then
-		-- table, error
-	else
 	end
 end
 
@@ -122,16 +132,22 @@ function M.free(stype)
 	stype._data_ = nil
 end
 
-function mt.__index(self, k)
-	if (type(k) ~= "number") then
+function mt.__index(key, nth)
+	if (type(nth) ~= "number") then
 		return nil
 	end
-	return M.get(k, self)
+	if (key._type_ == TTABLE) then
+		error("substruct can't use index syntax")
+	end
+	return M.get(nth, key)
 end
 
-function mt.__newindex(self, k, value)
-	if (type(k) ~= "number") then
-		return nil
+function mt.__newindex(key, nth, value)
+	if (key._type_ == TTABLE) then
+		error("substruct can't use index syntax")
 	end
-	M.set(k, self, value)
+	if (type(nth) ~= "number") then
+		error("index shoud be number")
+	end
+	M.set(nth, key, value)
 end

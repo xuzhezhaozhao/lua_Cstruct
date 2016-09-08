@@ -5,13 +5,14 @@ local function test(exp, caseN)
 	print(string.format("case #%d passed", caseN))
 end
 
-local student = {id="number", name="string", score="number"}
+local student = {id="number", name="string", score="number", good="bool"}
 local school = {name="string", id="number",  pub="number", student=student, http="number"}
 local size = 20
-local length = 56
+local length = 57
 local st = cs.create(school, size)
 
 test(st._n_ == size, 1)
+print(st._length_)
 test(st._length_ == length, 2)
 test(st._data_ ~= nil, 3)
 test(st._root_ == st, 4)
