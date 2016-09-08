@@ -90,6 +90,10 @@ function M.create(ltype, n)
 end
 
 function M.get(nth, key)
+	if (key._root_._data_ == nil) then
+		error("array already be freed")
+	end
+
 	local data = key._root_._data_
 	local len = key._root_._length_
 
@@ -110,12 +114,17 @@ function M.get(nth, key)
 end
 
 function M.set(nth, key, value)
+	if (key._root_._data_ == nil) then
+		error("array already be freed")
+	end
+
 	local len = key._root_._length_
 
 	if (nth > key._root_._n_) then
 		-- realloc
+		local oldsize = len * key._root_._n_
 		local newsize = len * nth
-		local data, errmsg = clib.realloc(key._root_._data_, newsize)
+		local data, errmsg = clib.realloc(key._root_._data_, oldsize, newsize)
 		if (data == nil) then
 			error(string.format("clib realloc: %s", errmsg))
 		end

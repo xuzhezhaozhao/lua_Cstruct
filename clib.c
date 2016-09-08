@@ -8,7 +8,7 @@
 
 static int C_alloc(lua_State* L) {
 	lua_Integer size = luaL_checkinteger(L, 1);
-	void *p = malloc(size);
+	void *p = calloc(size, 1);
 	if (p == NULL) {
 		lua_pushnil(L);
 		lua_pushstring(L, strerror(errno));
@@ -21,12 +21,16 @@ static int C_alloc(lua_State* L) {
 static int C_realloc(lua_State* L) {
 	char *data = (char *)lua_touserdata(L, 1);
 	luaL_argcheck(L, data != NULL, 1, "Wrong Parameter (expected userdata).");
-	lua_Integer newsize = luaL_checkinteger(L, 2);
+	lua_Integer oldsize = luaL_checkinteger(L, 2);
+	lua_Integer newsize = luaL_checkinteger(L, 3);
 	void *p = realloc(data, newsize);
 	if (p == NULL) {
 		lua_pushnil(L);
 		lua_pushstring(L, strerror(errno));
 		return 2;
+	}
+	if (newsize > oldsize) {
+		memset((char *)p + oldsize, 0, newsize - oldsize);
 	}
 	lua_pushlightuserdata(L, p);
 	return 1;

@@ -46,13 +46,13 @@ lua 代码为：
   student = { id = "number", name = "string", score = "number", good = "bool" }
   ```
 
-基本语法就是，定义一个表，表中 key 为结构的字段，对应 value 为字段的数据类型，基本数据类型有 number，string， bool 三种, 其中number类型可以表示整数和浮点数，string 为变长字符串类型，内部实现时保存的是一个指针.
+基本语法就是，定义一个表，表中 key 为结构的字段，对应 value 为字段的数据类型，基本数据类型有 number，string， bool 三种, 其中 number 类型可以表示整数和浮点数，string 为变长字符串类型，内部实现时保存的是一个指针.
 
 
 
 
 ### 嵌套的数据结构
-现在我要在 student 结构中增加一个字段，address, 这个字段也是一个结构，其结构定义如下：
+现在我要在 `student` 结构中增加一个字段 `address`, 这个字段也是一个结构，其结构定义如下：
 
   ```
   struct address {
@@ -83,9 +83,9 @@ lua 代码为：
 创建结构数组
 -----
 
-在 lua 中定义好结构之后, 下面创建结构数组, `make` 编译代码，在当前目录会生成 clib.so 文件. 使用时只需要 `require "cs"` 即可. 创建好的结构数组的大小是动态调整的.
+在 lua 中定义好结构之后, 下面创建结构数组, `make` 编译代码，在当前目录会生成 clib.so 文件 (`make test` 运行测试). 使用时只需要 `require "cs"` 即可. 创建好的结构数组的大小是动态调整的.
 
-利用 `cs` package 中提供的 `create` 来创建结构数组:
+利用 `cs.create` 函数来创建结构数组:
   ```
   require "cs"
   address = {city = "string", street = "string", room = "number"}
@@ -107,7 +107,11 @@ lua 代码为：
   ```
   -- 读取第1个元素 id 字段的值
   -- get 函数有两个参数，第一个为访问元素的下标(1起始), 第二个参数为访问字段
-  cs.get(1, array.id)	-- 此时 get 将返回 nil, 因为还没有设置过该字段的值
+  -- number, string, bool 三种类型初始值分别为: 0, nil, false
+  cs.get(1, array.id)	-- 此时 get 将返回初始值 0, 因为还没有设置过该字段的值
+
+  -- 越界读取(数组大小为20, 访问下标为 30)时返回值都是 nil
+  cs.get(30, array.id)	-- 返回 nil
 
   -- 设置第1个元素 id 字段的值为 1001
   -- set 函数有三个参数，前两个与 get 函数相同，第三个为待设置的值
@@ -119,7 +123,7 @@ lua 代码为：
   cs.set(1, array.name, "Zhang San")
   cs.get(1, array.name)
 
-  -- 当访问下标大于当前数组大小时，数组会动态增大
+  -- 当 set 元素下标大于当前数组大小时，数组会动态增大
   cs.set(30, array.addr.city, "Beijing") -- 30大于数组大小20, 数组大小将增大为 30
   cs.get(30, array.addr.city)	-- 返回 "Beijing"
   ```
