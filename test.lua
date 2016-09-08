@@ -95,6 +95,10 @@ st.student.id[21] = 2001
 test(st._n_ == 21, 48)
 test(st.student.id[21] == 2001, 49)
 
+st.student.good[2] = true
+test(st.student.good[2] == true, 50)
+st.student.good[2] = false 
+test(st.student.good[2] == false, 51)
 
 cs.free(st)
-test(st._data_ == nil, 50)
+test(st._data_ == nil, 52)
