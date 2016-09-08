@@ -4,5 +4,5 @@ all:
 clean:
 	rm -rf clib.so
 
-test:
+test: all
 	lua5.1 test.lua

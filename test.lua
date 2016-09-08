@@ -84,3 +84,16 @@ test(st.name[2] == "wusong", 42)
 
 st.student.id[12] = 1001
 test(st.student.id[12] == 1001, 43)
+
+st.student.id[20] = 2002
+test(st._n_ == 20, 45)
+test(st.student.id._root_._length_ == st._length_, 46)
+test(st.student.id[20] == 2002, 47)
+
+st.student.id[21] = 2001
+test(st._n_ == 21, 48)
+test(st.student.id[21] == 2001, 49)
+
+
+cs.free(st)
+test(st._data_ == nil, 50)
