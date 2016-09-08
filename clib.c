@@ -56,7 +56,7 @@ static int set_string(lua_State* L) {
 	return 0;
 }
 
-static luaL_Reg mylib[] = {
+static luaL_Reg clib[] = {
 	{"calloc", C_alloc},
 	{"get_number", get_number},
 	{"set_number", set_number},
@@ -65,7 +65,7 @@ static luaL_Reg mylib[] = {
 	{NULL, NULL}
 };
 
-int luaopen_mylib(lua_State* L) {
-	luaL_register(L, "mylib", mylib);
+int luaopen_clib(lua_State* L) {
+	luaL_register(L, "clib", clib);
 	return 1;
 }
