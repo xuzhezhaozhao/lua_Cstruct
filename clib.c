@@ -8,7 +8,12 @@
 
 static int C_alloc(lua_State* L) {
 	lua_Integer size = luaL_checkinteger(L, 1);
-	void *p = calloc(size, 1);
+	void *p = malloc(size);
+	if (p == NULL) {
+		lua_pushnil(L);
+		lua_pushstring(L, strerror(errno));
+		return 2;
+	}
 	lua_pushlightuserdata(L, p);
 	return 1;
 }
@@ -18,6 +23,11 @@ static int C_realloc(lua_State* L) {
 	luaL_argcheck(L, data != NULL, 1, "Wrong Parameter (expected userdata).");
 	lua_Integer newsize = luaL_checkinteger(L, 2);
 	void *p = realloc(data, newsize);
+	if (p == NULL) {
+		lua_pushnil(L);
+		lua_pushstring(L, strerror(errno));
+		return 2;
+	}
 	lua_pushlightuserdata(L, p);
 	return 1;
 }

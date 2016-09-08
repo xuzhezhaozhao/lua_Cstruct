@@ -7,7 +7,7 @@ end
 
 local student = {id="number", name="string", score="number", good="bool"}
 local school = {name="string", id="number",  pub="number", student=student, http="number"}
-local size = 20
+local size = 1 
 local length = 57
 local st = cs.create(school, size)
 
@@ -39,10 +39,10 @@ test(st.student.score._root_ == st, 19)
 
 print("\nset & get test...")
 test(cs.get(2, st.name) == nil, 20)
-test(cs.get(2, st.id) == 0, 21)
+test(cs.get(2, st.id) == nil, 21)
 test(cs.get(12, st.student) == nil, 22)
 test(cs.get(19, st.student.name) == nil, 23)
-test(cs.get(19, st.student.id) == 0, 24)
+test(cs.get(19, st.student.id) == nil, 24)
 
 cs.set(2, st.name, "zhangshuzhongxue")
 test(cs.get(2, st.name) == "zhangshuzhongxue", 25)

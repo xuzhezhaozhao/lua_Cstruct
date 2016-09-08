@@ -74,11 +74,12 @@ function M.create(ltype, n)
 	if (n == nil) then
 		n = 1
 	end
-	if (n < 0) then
-		error("argument error: n should greater than 0")
+	if (n <= 0) then
+		error("argument error: arg #2 should greater than 0")
 	end
 	local stype = _define_structure(ltype)
-	local data, errmsg = clib.calloc(n*stype._length_)
+	local size = n * stype._length_
+	local data, errmsg = clib.calloc(size)
 	if (data == nil) then
 		error(string.format("clib malloc: %s", errmsg))
 	end
@@ -91,6 +92,10 @@ end
 function M.get(nth, key)
 	local data = key._root_._data_
 	local len = key._root_._length_
+
+	if (nth > key._root_._n_) then
+		return nil
+	end
 
 	if (key._type_ == TNUMBER) then
 		-- number
@@ -109,7 +114,12 @@ function M.set(nth, key, value)
 
 	if (nth > key._root_._n_) then
 		-- realloc
-		key._root_._data_ = clib.realloc(key._root_._data_, len*nth)
+		local newsize = len * nth
+		local data, errmsg = clib.realloc(key._root_._data_, newsize)
+		if (data == nil) then
+			error(string.format("clib realloc: %s", errmsg))
+		end
+		key._root_._data_ = data
 		key._root_._n_ = nth
 	end
 
