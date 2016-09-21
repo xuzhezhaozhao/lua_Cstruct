@@ -1,6 +1,6 @@
 **lua 内置的数据结构 table 对内存的使用率不高, 有些应用场景下, 可能会有很多个 table, 但每个 table 中的字段都是一样的, 由于 table 底层是 hash 表实现, 内存浪费比较严重，这个时候希望能够在 C/C++ 中分配一块连续内存存储这些 table 以提高内存利用率, 另外还希望可以在 lua 中定义结构, 并且方便的访问结构字段. 本程序库提供了接口解决这些问题.**
 
-Authors: zhezhao xu (zhezhao@gmail.com)
+Authors: zhezhao xu (zhezhaoxu@gmail.com)
 
 NOTES
 -----
